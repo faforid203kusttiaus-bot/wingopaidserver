@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Unique Prediction Bot Panel</title>
+<style>
+  body {
+    margin: 0; padding: 15px;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #00ff99;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+  .main-container {
+    max-width: 800px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+  .box {
+    background: linear-gradient(145deg, #222 0%, #333 100%);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 255, 153, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 153, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 255, 153, 0.2);
+  }
+  h3 {
+    margin: 0 0 15px 0;
+    font-weight: 700;
+    text-align: center;
+    font-size: 18px;
+    color: #00ff99;
+    text-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+    letter-spacing: 1px;
+  }
+  button {
+    display: block;
+    margin: 0 auto 15px auto;
+    padding: 10px 20px;
+    background: linear-gradient(45deg, #00ff99, #00cc77);
+    border: none;
+    border-radius: 25px;
+    color: #121212;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 255, 153, 0.3);
+  }
+  button:hover {
+    background: linear-gradient(45deg, #00cc77, #00ff99);
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 255, 153, 0.4);
+  }
+  button:active {
+    transform: scale(0.98);
+  }
+  button:disabled {
+    background: #555;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .period {
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #ffffff;
+    background: rgba(0, 255, 153, 0.1);
+    padding: 8px;
+    border-radius: 10px;
+  }
+  .signal {
+    font-weight: 900;
+    text-align: center;
+    font-size: 24px;
+    padding: 15px;
+    border-radius: 15px;
+    margin: 10px 0;
+    background: linear-gradient(145deg, rgba(77, 148, 255, 0.1) 0%, rgba(77, 148, 255, 0.2) 100%);
+    border: 1px solid rgba(77, 148, 255, 0.3);
+    text-shadow: 0 0 10px rgba(77, 148, 255, 0.5);
+    transition: all 0.3s ease;
+  }
+  .signal.big {
+    background: linear-gradient(145deg, rgba(255, 77, 77, 0.1) 0%, rgba(255, 77, 77, 0.2) 100%);
+    border-color: rgba(255, 77, 77, 0.3);
+    color: #ff4d4d;
+    text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+  }
+  .signal.neutral {
+    background: linear-gradient(145deg, rgba(0, 255, 153, 0.1) 0%, rgba(0, 255, 153, 0.2) 100%);
+    border-color: rgba(0, 255, 153, 0.3);
+    color: #00ff99;
+    text-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+  }
+  .signal.small {
+    background: linear-gradient(145deg, rgba(77, 148, 255, 0.1) 0%, rgba(77, 148, 255, 0.2) 100%);
+    border-color: rgba(77, 148, 255, 0.3);
+    color: #4d94ff;
+    text-shadow: 0 0 10px rgba(77, 148, 255, 0.5);
+  }
+  .history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #00ff99 #333;
+  }
+  .history-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .history-list::-webkit-scrollbar-track {
+    background: #333;
+  }
+  .history-list::-webkit-scrollbar-thumb {
+    background: #00ff99;
+    border-radius: 3px;
+  }
+  .history-list li {
+    background: linear-gradient(145deg, #333 0%, #444 100%);
+    margin-bottom: 8px;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    border-left: 4px solid #00ff99;
+    transition: all 0.3s ease;
+  }
+  .history-list li:hover {
+    background: linear-gradient(145deg, #444 0%, #555 100%);
+    border-left-color: #4d94ff;
+  }
+  .history-list li .number.big {
+    color: #ff4d4d;
+    font-weight: bold;
+  }
+  .history-list li .number.small {
+    color: #4d94ff;
+    font-weight: bold;
+  }
+  .outcome {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 5px;
+  }
+  .outcome.win {
+    color: #00ff00;
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid rgba(0, 255, 0, 0.3);
+  }
+  .outcome.loss {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+    border: 1px solid rgba(255, 77, 77, 0.3);
+  }
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 255, 153, 0.05);
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .stats .win-count {
+    color: #00ff00;
+  }
+  .stats .loss-count {
+    color: #ff4d4d;
+  }
+  .latest-period {
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  .status {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #00ff99;
+  }
+  @media (max-width: 768px) {
+    .main-container {
+      grid-template-columns: 1fr;
+      gap: 15px;
+      padding: 10px;
+    }
+    .box {
+      padding: 15px;
+    }
+    .signal {
+      font-size: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="main-container">
+  <div class="box" id="predictionBox">
+    <h3>Prediction Box</h3>
+    <button id="generateSignalBtn">Generate Signal (Manual)</button>
+    <div class="period" id="predictionPeriod">Period: -</div>
+    <div class="signal neutral" id="predictionSignal">-</div>
+    <div class="status" id="status">Auto-refresh: Active (every 2 seconds)</div>
+  </div>
+
+  <div class="box" id="latestHistoryBox">
+    <h3>Latest History (Real Results)</h3>
+    <div class="latest-period" id="latestPeriod">Latest Period: -</div>
+    <ul class="history-list" id="latestHistoryList"></ul>
+  </div>
+
+  <div class="box" id="botHistoryBox">
+    <h3>Bot History (Predictions)</h3>
+    <ul class="history-list" id="botHistoryList"></ul>
+    <div class="stats">
+      <span class="win-count">Wins: 0</span>
+      <span class="loss-count">Losses: 0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const predictionPeriodEl = document.getElementById('predictionPeriod');
+  const predictionSignalEl = document.getElementById('predictionSignal');
+  const latestPeriodEl = document.getElementById('latestPeriod');
+  const latestHistoryListEl = document.getElementById('latestHistoryList');
+  const botHistoryListEl = document.getElementById('botHistoryList');
+  const generateSignalBtn = document.getElementById('generateSignalBtn');
+  const winCountEl = document.querySelector('.win-count');
+  const lossCountEl = document.querySelector('.loss-count');
+  const statusEl = document.getElementById('status');
+
+  const apiURL = 'https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json';
+
+  let realHistory = [];
+  let botPredictions = []; // Array of {period, signal, outcome: null|'win'|'loss'}
+  let wins = 0;
+  let losses = 0;
+  let lastLatestPeriod = null;
+  let autoInterval = null;
+
+  function getBigSmall(number) {
+    return parseInt(number) >= 5 ? 'BIG' : 'SMALL';
+  }
+
+  async function fetchHistory() {
+    try {
+      const res = await fetch(apiURL);
+      const data = await res.json();
+      if (data.code === 0 && data.data && data.data.list) {
+        return data.data.list;
+      }
+      return [];
+    } catch (e) {
+      console.error('API fetch error:', e);
+      return [];
+    }
+  }
+
+  function updateLatestHistory() {
+    if (!realHistory.length) return;
+
+    const sorted = realHistory.sort((a, b) => b.issueNumber.localeCompare(a.issueNumber));
+    const latestIssue = sorted[0];
+    latestPeriodEl.textContent = 'Latest Period: ' + latestIssue.issueNumber;
+
+    const last5 = sorted.slice(0, 5);
+    latestHistoryListEl.innerHTML = '';
+    last5.forEach(item => {
+      const li = document.createElement('li');
+      const bs = getBigSmall(item.number);
+      li.innerHTML = `
+        <span>${item.issueNumber}</span>
+        <span class="number ${bs.toLowerCase()}">${item.number} (${bs})</span>
+      `;
+      latestHistoryListEl.appendChild(li);
+    });
+  }
+
+  function updateBotHistory() {
+    botHistoryListEl.innerHTML = '';
+    botPredictions.slice(-1).reverse().forEach(pred => { // Show last 1, oldest first
+      const li = document.createElement('li');
+      let outcomeHtml = '';
+      if (pred.outcome) {
+        const className = pred.outcome;
+        const text = pred.outcome.toUpperCase();
+        outcomeHtml = `<span class="outcome ${className}">${text}</span>`;
+      }
+      li.innerHTML = `
+        <span>${pred.period}</span>
+        <span class="number ${pred.signal.toLowerCase()}">${pred.signal}</span>
+        ${outcomeHtml}
+      `;
+      botHistoryListEl.appendChild(li);
+    });
+
+    winCountEl.textContent = `Wins: ${wins}`;
+    lossCountEl.textContent = `Losses: ${losses}`;
+  }
+
+  function checkOutcomes() {
+    if (botPredictions.length === 0 || realHistory.length === 0) return;
+
+    const sortedReal = realHistory.sort((a, b) => b.issueNumber.localeCompare(a.issueNumber));
+    const realPeriods = new Set(sortedReal.map(item => item.issueNumber));
+
+    let updated = false;
+    botPredictions.forEach(pred => {
+      if (pred.outcome === null && realPeriods.has(pred.period)) {
+        // Find the real result for this period
+        const realItem = sortedReal.find(item => item.issueNumber === pred.period);
+        if (realItem) {
+          const realBs = getBigSmall(realItem.number);
+          if (realBs === pred.signal) {
+            pred.outcome = 'win';
+            wins++;
+          } else {
+            pred.outcome = 'loss';
+            losses++;
+          }
+          updated = true;
+        }
+      }
+    });
+    if (updated) {
+      updateBotHistory();
+    }
+  }
+
+  function generatePrediction() {
+    const sorted = realHistory.sort((a, b) => b.issueNumber.localeCompare(a.issueNumber));
+    const latestIssue = sorted[0];
+    let latestNumber = latestIssue.issueNumber;
+
+    // Increment for next period
+    let prefix = latestNumber.slice(0, 13);
+    let suffix = latestNumber.slice(13);
+    let suffixNum = parseInt(suffix || '0', 10);
+    suffixNum++;
+    let predictionPeriod = prefix + suffixNum.toString().padStart(suffix.length || 1, '0');
+    predictionPeriodEl.textContent = 'Period: ' + predictionPeriod;
+
+    // Generate signal based on last 3 real results
+    const last3 = sorted.slice(0, 3);
+    let bigCount = 0, smallCount = 0;
+    last3.forEach(item => {
+      if (getBigSmall(item.number) === 'BIG') bigCount++;
+      else smallCount++;
+    });
+
+    let signal = 'NEUTRAL';
+    if (bigCount >= 2) signal = 'BIG';
+    else if (smallCount >= 2) signal = 'SMALL';
+
+    // Store prediction
+    botPredictions.push({ period: predictionPeriod, signal, outcome: null });
+    if (botPredictions.length > 10) botPredictions.shift(); // Keep last 10 to avoid too many
+
+    // Display signal
+    predictionSignalEl.textContent = signal;
+    predictionSignalEl.className = 'signal ' + signal.toLowerCase();
+    if (signal === 'BIG') {
+      predictionSignalEl.style.color = '#ff4d4d';
+      predictionSignalEl.style.textShadow = '0 0 10px rgba(255, 77, 77, 0.5)';
+    } else if (signal === 'SMALL') {
+      predictionSignalEl.style.color = '#4d94ff';
+      predictionSignalEl.style.textShadow = '0 0 10px rgba(77, 148, 255, 0.5)';
+    } else {
+      predictionSignalEl.style.color = '#00ff99';
+      predictionSignalEl.style.textShadow = '0 0 10px rgba(0, 255, 153, 0.5)';
+    }
+
+    // Update bot history
+    updateBotHistory();
+  }
+
+  async function autoUpdate() {
+    realHistory = await fetchHistory();
+    if (!realHistory.length) return;
+
+    const sorted = realHistory.sort((a, b) => b.issueNumber.localeCompare(a.issueNumber));
+    const currentLatest = sorted[0].issueNumber;
+
+    checkOutcomes();
+    updateLatestHistory();
+
+    // If new period result is available (compared to last known), generate new prediction
+    if (lastLatestPeriod && lastLatestPeriod !== currentLatest) {
+      generatePrediction();
+      statusEl.textContent = `Auto-refresh: Active (every 2 seconds) - New prediction generated for next period`;
+    } else if (!lastLatestPeriod) {
+      // Initial load: generate first prediction
+      generatePrediction();
+      lastLatestPeriod = currentLatest;
+      statusEl.textContent = `Auto-refresh: Active (every 2 seconds) - Initial prediction generated`;
+    }
+
+    lastLatestPeriod = currentLatest;
+  }
+
+  async function generateSignal() {
+    // Manual generate: fetch and generate immediately
+    generateSignalBtn.disabled = true;
+    realHistory = await fetchHistory();
+    if (!realHistory.length) {
+      alert('Failed to fetch real history');
+      generateSignalBtn.disabled = false;
+      return;
+    }
+    checkOutcomes();
+    updateLatestHistory();
+    generatePrediction();
+    generateSignalBtn.disabled = false;
+  }
+
+  // Start auto-refresh every 2 seconds
+  function startAutoRefresh() {
+    autoInterval = setInterval(autoUpdate, 2000);
+    statusEl.textContent = 'Auto-refresh: Active (every 2 seconds)';
+  }
+
+  // Initial load
+  (async () => {
+    await autoUpdate();
+    startAutoRefresh();
+  })();
+
+  // Button for manual generate
+  generateSignalBtn.addEventListener('click', generateSignal);
+</script>
+
+</body>
+</html>
